@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@2.7.8/dist/vue.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <title>Máthisi Hub - UK</title>
+    <style>
+        /* Custom Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f9fc;
+        }
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity 0.5s;
+        }
+        .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+            opacity: 0;
+        }
+        .btn-animated {
+            transition: transform 0.2s ease;
+        }
+        .btn-animated:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- Navigation Bar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+            <div class="container">
+                <a class="navbar-brand" href="#">Máthisi Hub</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" @click="openLoginModal">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" @click="openRegisterModal">Register</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" @click="viewCart">
+                                <span class="fas fa-shopping-cart me-1"></span> Cart <span class="badge bg-danger">{{ cartCount }}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Class Listings -->
+        <div class="container my-5">
+            <h2 class="text-center mb-4">Available Classes</h2>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="filter" class="form-label">Filter by Subject:</label>
+                    <select class="form-select" v-model="selectedSubject">
+                        <option value="">All</option>
+                        <option v-for="subject in uniqueSubjects" :key="subject">{{ subject }}</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="sort" class="form-label">Sort by Price:</label>
+                    <select class="form-select" v-model="sortOption">
+                        <option value="asc">Lowest to Highest</option>
+                        <option value="desc">Highest to Lowest</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <transition-group name="fade" tag="div" class="row">
+                    <div v-for="classItem in filteredAndSortedClasses" :key="classItem.id" class="col-md-4 mb-4">
+                        <div class="card shadow-sm">
+                            <img :src="classItem.image" class="card-img-top" :alt="classItem.title">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ classItem.title }}</h5>
+                                <p class="card-text">{{ classItem.description }}</p>
+                                <p>Price: £{{ classItem.price }}</p>
+                                <button class="btn btn-success btn-animated" @click="addToCart(classItem)">
+                                    <span class="fas fa-cart-plus me-1"></span> Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </transition-group>
+            </div>
+        </div>
+
+        <!-- Login Modal -->
+        <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" ref="loginModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="loginModalLabel">Login</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form @submit.prevent="login">
+                            <div class="mb-3">
+                                <label for="loginEmail" class="form-label">Email address</label>
+                                <input type="email" class="form-control" v-model="loginData.email" id="loginEmail" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="loginPassword" class="form-label">Password</label>
+                                <input type="password" class="form-control" v-model="loginData.password" id="loginPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Login</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Modal -->
+        <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true" ref="registerModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="registerModalLabel">Register</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form @submit.prevent="register">
+                            <div class="mb-3">
+                                <label for="registerEmail" class="form-label">Email address</label>
+                                <input type="email" class="form-control" v-model="registerData.email" id="registerEmail" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="registerPassword" class="form-label">Password</label>
+                                <input type="password" class="form-control" v-model="registerData.password" id="registerPassword" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="registerConfirmPassword" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" v-model="registerData.confirmPassword" id="registerConfirmPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Register</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Modal -->
+        <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true" ref="cartModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cartModalLabel">Shopping Cart</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div v-if="cart.length === 0">
+                            <p>No items added to cart yet.</p>
+                        </div>
+                        <ul class="list-group" v-else>
+                            <li v-for="item in cart" :key="item.id" class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ item.title }} - £{{ item.price }}
+                                <button class="btn btn-danger btn-sm" @click="removeFromCart(item.id)">
+                                    <span class="fas fa-trash-alt"></span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vue.js Script -->
+        <script>
+            new Vue({
+                el: '#app',
+                data: {
+                    cart: [],
+                    loginData: { email: '', password: '' },
+                    registerData: { email: '', password: '', confirmPassword: '' },
+                    selectedSubject: '',
+                    sortOption: 'asc',
+                    classList: [
+                        { id: 1, title: 'Maths Tutoring - Year 10', description: 'Maths support for Year 10 students.', price: 30, subject: 'Maths', image: 'images/math-image.jpg' },
+                        { id: 2, title: 'Science Class - Year 11', description: 'Science concepts for Year 11 students.', price: 25, subject: 'Science', image: 'images/science-image.jpg' },
+                        { id: 3, title: 'English Literature - GCSE', description: 'In-depth analysis of English literature.', price: 35, subject: 'English', image: 'images/english-image.jpg' },
+                        { id: 5, title: 'Painting for Young Artists', description: 'A creative painting class for aspiring artists.', price: 22, subject: 'Arts', image: 'images/arts-image.jpg' },
+                        { id: 6, title: 'Robotics and Coding - Level 1', description: 'Learn the basics of robotics and programming.', price: 50, subject: 'Technology', image: 'images/technology-image.jpg' },
+                        { id: 7, title: 'History of the UK - Key Stage 3', description: 'Explore the rich history of the United Kingdom.', price: 28, subject: 'History', image: 'images/history-image.jpg' },
+                        { id: 8, title: 'Drama and Acting Workshop', description: 'An interactive workshop focused on acting skills.', price: 30, subject: 'Drama', image: 'images/drama-image.jpg' },
+                        { id: 9, title: 'Physical Education and Fitness', description: 'A fun fitness class for kids to stay active.', price: 18, subject: 'Physical Education', image: 'images/physical_education-image.jpg' },
+                        { id: 10, title: 'Music Lessons - Guitar', description: 'Learn to play the guitar from experienced instructors.', price: 40, subject: 'Music', image: 'images/music-image.jpg' }
+                    ],
+                    uniqueSubjects: ['Maths', 'Science', 'English'],
+                },
+                computed: {
+                    filteredAndSortedClasses() {
+                        let filtered = this.classList;
+                        if (this.selectedSubject) {
+                            filtered = filtered.filter(classItem => classItem.subject === this.selectedSubject);
+                        }
+                        if (this.sortOption === 'asc') {
+                            filtered.sort((a, b) => a.price - b.price);
+                        } else {
+                            filtered.sort((a, b) => b.price - a.price);
+                        }
+                        return filtered;
+                    },
+                    cartCount() {
+                        return this.cart.length;
+                    }
+                },
+                methods: {
+                    addToCart(classItem) {
+                        this.cart.push(classItem);
+                    },
+                    removeFromCart(classId) {
+                        this.cart = this.cart.filter(item => item.id !== classId);
+                    },
+                    openLoginModal() {
+                        this.$refs.loginModal.show();
+                    },
+                    openRegisterModal() {
+                        this.$refs.registerModal.show();
+                    },
+                    viewCart() {
+                        this.$refs.cartModal.show();
+                    },
+                    login() {
+                         // Simulated login logic
+                        if (this.loginData.email && this.loginData.password) {
+                            // Here, you would typically validate the credentials with a backend API
+                            alert(`Login successful! Welcome, ${this.loginData.email}`);
+                            
+                            // Reset the form fields
+                            this.loginData.email = '';
+                            this.loginData.password = '';
+                            
+                            // Close the login modal
+                            this.$refs.loginModal.hide();
+                        } else {
+                            alert('Please enter both email and password.');
+                        }
+                    },
+                    register() {
+                        // Simulated registration logic
+                        if (this.registerData.password !== this.registerData.confirmPassword) {
+                            alert('Passwords do not match. Please try again.');
+                            return;
+                        }
+
+                        if (this.registerData.email && this.registerData.password) {
+                            // Here, you would typically send the registration data to a backend API
+                            alert(`Registration successful! You can now log in with ${this.registerData.email}`);
+                            
+                            // Reset the registration form fields
+                            this.registerData.email = '';
+                            this.registerData.password = '';
+                            this.registerData.confirmPassword = '';
+                            
+                            // Close the registration modal
+                            this.$refs.registerModal.hide();
+                        } else {
+                            alert('Please fill in all fields.');
+                        }
+                    }
+                },
+                mounted() {
+                    const bsModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                    const bsModal2 = new bootstrap.Modal(document.getElementById('registerModal'));
+                    const bsModal3 = new bootstrap.Modal(document.getElementById('cartModal'));
+                    this.$refs.loginModal = bsModal;
+                    this.$refs.registerModal = bsModal2;
+                    this.$refs.cartModal = bsModal3;
+                }
+            });
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+</body>
+</html>
