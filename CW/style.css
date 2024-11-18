@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
+
+body {
+font-family: 'Manrope', 'sans-serif';
+background-color: #f7f9fc;
+margin-inline: 5%;
+}
+
+.navigation {
+    padding-block-start: 2%;
+}
+
+.fade-enter-active, .fade-leave-active {
+transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to {
+opacity: 0;
+}
+.btn-animated {
+transition: transform 0.2s ease;
+}
+.btn-animated:hover {
+transform: scale(1.05);
+}
+
+#checkout {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-evenly; 
+    padding: 20px;
+    flex-wrap: wrap; 
+    gap: 20px; 
+}
+
+form {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 100%; 
+    max-width: 300px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+form p {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 15px;
+    align-items: flex-start;
+}
+
+form input {
+    height: 40px;
+    border: 1px solid hsla(17, 100%, 45%, 0.75);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 300px; 
+    padding: 5px; 
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.details {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px; 
+    background: hsla(17, 100%, 45%, 0.4);
+    border-radius: 15px;
+    box-sizing: border-box;
+    flex-grow: 1; 
+}
+
+.details h1 {
+    margin-bottom: 15px;
+}
+
+.details p {
+    margin: 5px 0;
+}
+
+
+.detail {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    width: 350px;
+}

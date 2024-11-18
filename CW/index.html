@@ -1,117 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://unpkg.com/vue@2.7.8/dist/vue.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-  <!-- <script src="list.js"></script> -->
-  <link rel="stylesheet" href="style.css">
-  <title>Máthisi Hub - UK</title>
-</head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@2.7.8/dist/vue.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <!-- <script src="list.js"></script> -->
+    <link rel="stylesheet" href="style.css">
+    <title>Máthisi Hub - UK</title>
+  </head>
 
-<body>
-  <div id="app">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
-      <div class="container">
-        <a class="navbar-brand" href="#">Máthisi Hub</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="#">Login</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Register</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span class="fas fa-shopping-cart me-1"></span> Cart <span class="badge bg-danger">{{ cart.length }}</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-
-    <div class="container my-5">
-      <h2 class="text-center mb-4">Available Classes</h2>
-      <div class="row mb-3">
-        <div class="col-md-4">
-          <label for="filter" class="form-label">Filter by Subject:</label>
-          <select class="form-select" v-model="selectedSubject">
-            <option value="">All</option>
-            <option v-for="subject in uniqueSubjects" :key="subject">{{ subject }}</option>
-          </select>
-        </div>
-        <div class="col-md-4">
-          <label for="sort" class="form-label">Sort by Price:</label>
-          <select class="form-select" v-model="sortOption">
-            <option value="asc">Lowest to Highest</option>
-            <option value="desc">Highest to Lowest</option>
-            <option value="desc">Subject</option>
-            <option value="desc">Location</option>
-            <option value="desc">Price</option>
-            <option value="desc">Spaces</option>
-
-          </select>
-        </div>
-      </div>
-      <div class="row">
-        <transition-group name="fade" tag="div" class="row">
-          <div v-for="list in filteredAndSortedClasses" :key="list.id" class="col-md-4 mb-4">
-            <div class="card shadow-sm">
-              <img :src="list.image" class="card-img-top" :alt="list.title">
-              <div class="card-body">
-                <h5 class="card-title">{{ list.title }}</h5>
-                <p class="card-text">{{ list.description }}</p>
-                <p>Price: £{{ list.price }}</p>
-                <p>Spaces: {{ itemsLeft(list) }}</p>
-
-                <button 
-                  class="btn btn-success btn-animated" 
-                  v-if="canAddtoCart(list)" 
-                  @click="addToCart(list)" 
-                  :disabled="list.spaces === 0">
-                  <span class="fas fa-cart-plus me-1"></span> Add to Cart
+  <body>
+    <div id="app">
+      <!--Navigation Bar-->
+      <div class="navigation">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+          <div class="container">
+            <a class="navbar-brand" href="#">Máthisi Hub</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Login</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Register</a>
+                </li>
+                <button @click="displayCheckout" v-if="cart.length > 0">
+                  Cart
+                  <span class="fa solid fa-cart-plus"></span><span class="badge bg-danger">{{ cart.length }}</span>
                 </button>
-              
+                <button v-else>
+                  Cart <span class="fa solid fa-cart-plus"> <span class="badge bg-danger">{{ cart.length }}</span></span>
+                </button>
+  
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </div>
+
+      <!--Display of Available Classes-->
+      <div class="content">
+        <h2 class="text-center mb-4">Available Classes</h2>
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="filter" class="form-label">Filter by Subject:</label>
+            <select class="form-select" v-model="selectedSubject">
+              <option value="">All</option>
+              <option v-for="subject in uniqueSubjects" :key="subject">{{ subject }}</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="sort" class="form-label">Sort by Price:</label>
+            <select class="form-select" v-model="sortOption">
+              <option value="asc">Lowest to Highest</option>
+              <option value="desc">Highest to Lowest</option>
+              <option value="desc">Subject</option>
+              <option value="desc">Location</option>
+              <option value="desc">Price</option>
+              <option value="desc">Spaces</option>
+
+            </select>
+          </div>
+        </div>
+
+        <!--Subject Card -->
+        <div class="subject_card" v-if="showPage">
+          <div class="row">
+            <transition-group name="fade" tag="div" class="row">
+              <!-- Ensure that each item has a unique key by combining `list.id` and `index` -->
+              <div v-for="(list, index) in filteredAndSortedClasses" :key="list.id + '-' + index" class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                  <img :src="list.image" class="card-img-top" :alt="list.title">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ list.title }}</h5>
+                    <p class="card-text">{{ list.description }}</p>
+                    <p>Price: £{{ list.price }}</p>
+                    <p>Spaces: {{ itemsLeft(list) }}</p>
+    
+                    <button 
+                      class="btn btn-success btn-animated" 
+                      v-if="canAddtoCart(list)" 
+                      @click="addToCart(list)" 
+                      :disabled="list.spaces === 0">
+                      <span class="fas fa-cart-plus me-1"></span> Add to Cart
+                    </button>
+                   </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </transition-group>
-      </div>
-    </div>
-
-    <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true" ref="cartModal">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="cartModalLabel">Shopping Cart</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <div v-if="cart.length === 0">
-              <p>No items added to cart yet.</p>
-            </div>
-            <ul class="list-group" v-else>
-              <li v-for="item in cart" :key="item.id" class="list-group-item d-flex justify-content-between align-items-center">
-                {{ item.title }} - £{{ item.price }}
-                <button class="btn btn-danger btn-sm" @click="removeFromCart(item)">
-                  <span class="fas fa-trash-alt"></span>
-                </button>
-              </li>
-            </ul>
+            </transition-group>
           </div>
         </div>
+
+
+        <div v-else id="displayCheckout">
+          <div class="orderSummary">
+              <h2>Cart Summary</h2>
+              <ul>
+                  <!-- Loop through cart items and display details -->
+                  <li v-for="list in cartDetails" :key="list.id">
+                      <p>Subject ID: {{ list.id }} </p>
+                      <p><strong>{{ list.title }}</strong></p>
+                      <p>Price: £{{ list.price }}</p>
+                      <button @click="removeFromCart(classList)">Remove</button>
+                  </li>
+              </ul>
+              <p v-if="cartDetails.length === 0">Your cart is empty!</p>
+              <hr>
+              <h3>Total: £{{ totalPrice }}</h3>
+          </div>
+          <form>
+              <h1>Checkout</h1>
+              <p><strong>Name</strong> <input v-model.trim="order.name"></p>
+              <p><strong>Phone</strong> <input v-model.trim="order.phone" type="tel"></p>
+              <p><strong>City</strong> <input v-model="order.city"></p>
+              <p><strong>Address</strong> <input v-model="order.address" type="address"></p>
+          </form>
+          <div class="detail">
+              <div class="details">
+                  <h1>Your Details</h1>
+                  <p>Name: <strong> {{ order.name }} </strong></p>
+                  <p>Phone: <strong> {{ order.phone }} </strong></p>
+                  <p>City: <strong> {{ order.city }} </strong></p>
+                  <p>Address: <strong> {{ order.address }}</strong></p>
+
+              </div>                        
+              <button @click="submitCheckOut">Checkout</button>
+          </div>
+        </div>
+
       </div>
-    </div>
+    </div> 
 
-    <script src="app.js"></script>
-
-</div>
-</body>
+  <script src="app.js"></script>
+  </body>
 </html>

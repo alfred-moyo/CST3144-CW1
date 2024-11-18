@@ -3,6 +3,7 @@ let app = new Vue({
   el: '#app',
   data: {
     cart: [],
+    showPage: true,
     selectedSubject: '',
     sortOption: 'asc',
     classList: list = [
@@ -21,6 +22,12 @@ let app = new Vue({
 
     ],
     uniqueSubjects: ['Maths', 'Science', 'English'],
+    order: {
+      name: "",
+      address: "",
+      city: "",
+      tel: ""
+    }
   },
   methods: {
       canAddtoCart(classList) {
@@ -41,12 +48,18 @@ let app = new Vue({
       },
       itemsLeft(classList) {
           return classList.spaces - this.cartCount(classList.id);
+      },
+      displayCheckout() {
+        this.showPage = !this.showPage;
+      },
+      submitCheckOut() {
+        alert("Order placed successfully!")
       }
   },
     computed: {
-      uniqueSubjects() {
-        return [...new Set(this.classList.map(item => item.subject))];
-      },
+      // uniqueSubjects() {
+      //   return [...new Set(this.classList.map(item => item.subject))];
+      // },
       filteredAndSortedClasses() {
         let filtered = this.classList;
         if (this.selectedSubject) {
@@ -58,6 +71,14 @@ let app = new Vue({
           filtered.sort((a, b) => b.price - a.price);
         }
         return filtered;
+      },
+
+      cartDetails() {
+        return this.cart;
+      },
+
+      totalPrice() {
+        return this.cartDetails.reduce((total, list) => total + list.price, 0);
       }
     }
     
