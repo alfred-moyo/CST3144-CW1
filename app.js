@@ -65,10 +65,15 @@ let app = new Vue({
         if (this.selectedSubject) {
           filtered = filtered.filter(item => item.subject === this.selectedSubject);
         }
+        //Sorting
         if (this.sortOption === 'asc') {
-          filtered.sort((a, b) => a.price - b.price);
+          filtered = filtered.sort((a, b) => a.title.localeCompare(b.title));
         } else if (this.sortOption === 'desc') {
-          filtered.sort((a, b) => b.price - a.price);
+          filtered = filtered.sort((a, b) => b.title.localeCompare(a.title));
+        } else if (this.sortOption === 'price-asc') {
+          filtered = filtered.sort((a, b) => a.price - b.price);
+        } else if (this.sortOption === 'price-desc') {
+          filtered = filtered.sort((a, b) => b.price - a.price);
         }
         return filtered;
       },
@@ -80,6 +85,21 @@ let app = new Vue({
       totalPrice() {
         return this.cartDetails.reduce((total, list) => total + list.price, 0);
       }
-    }
+    },
+    created() {
+      fetch('  ')
+          .then( res => {
+              if (!res.ok) {
+              throw new Error (`Status: {res.status}`);
+              }
+              return res.json();
+          })
+          .then(data => {
+              this.programs = data;
+              })
+          .catch(err => {
+              console.error('Error Fetching Programs', err);
+          });
+  }
     
 });
