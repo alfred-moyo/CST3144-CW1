@@ -72,16 +72,18 @@
         <div class="subject_card" v-if="showPage">
           <div class="row">
             <transition-group name="fade" tag="div" class="row">
-              <!-- Ensure that each item has a unique key by combining `list.id` and `index` -->
               <div v-for="(list, index) in filteredAndSortedClasses" :key="list.id + '-' + index" class="col-md-4 mb-4">
                 <div class="card shadow-sm">
-                  <img :src="list.image" class="card-img-top" :alt="list.title">
+                  <img :src="`${appURL}/${list.image}" class="card-img-top" :alt="list.title">
                   <div class="card-body">
                     <h5 class="card-title">{{ list.title }}</h5>
                     <p class="card-text">{{ list.description }}</p>
                     <p>Price: £{{ list.price }}</p>
                     <p>Spaces: {{ itemsLeft(list) }}</p>
-    
+                    <div>
+                      <span v-for="n in list.rating">★</span>
+                      <span v-for="n in 5 - list.rating">☆</span>
+                    </div>   
                     <button 
                       class="btn btn-success btn-animated" 
                       v-if="canAddtoCart(list)" 
