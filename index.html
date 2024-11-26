@@ -61,9 +61,7 @@
               <option value="desc">Highest to Lowest</option>
               <option value="price-asc">Price Ascending</option>
               <option value="price-desc">Price Descending</option>
-              <option value="desc">Rating</option>
-              <option value="desc">Spaces</option>
-
+              <option value="rating">Rating</option>
             </select>
           </div>
         </div>
@@ -72,17 +70,17 @@
         <div class="subject_card" v-if="showPage">
           <div class="row">
             <transition-group name="fade" tag="div" class="row">
-              <div v-for="(list, index) in filteredAndSortedClasses" :key="list.id + '-' + index" class="col-md-4 mb-4">
+              <div v-for="list in filteredAndSortedClasses" :key="list.id" class="col-md-4 mb-4">
                 <div class="card shadow-sm">
-                  <img :src="`${appURL}/${list.image}" class="card-img-top" :alt="list.title">
+                  <img :src="`${appURL}/${list.image}`" class="card-img-top" :alt="list.title">
                   <div class="card-body">
                     <h5 class="card-title">{{ list.title }}</h5>
                     <p class="card-text">{{ list.description }}</p>
                     <p>Price: £{{ list.price }}</p>
                     <p>Spaces: {{ itemsLeft(list) }}</p>
                     <div>
-                      <span v-for="n in list.rating">★</span>
-                      <span v-for="n in 5 - list.rating">☆</span>
+                      <span v-for="n in list.ratings">★</span>
+                      <span v-for="n in 5 - list.ratings">☆</span>
                     </div>   
                     <button 
                       class="btn btn-success btn-animated" 
@@ -98,17 +96,18 @@
           </div>
         </div>
 
-
+        <!--Cart-->
         <div v-else id="displayCheckout">
           <div class="orderSummary">
               <h2>Cart Summary</h2>
               <ul>
                   <!-- Loop through cart items and display details -->
                   <li v-for="list in cartDetails" :key="list.id">
-                      <p>Subject ID: {{ list.id }} </p>
-                      <p><strong>{{ list.title }}</strong></p>
-                      <p>Price: £{{ list.price }}</p>
-                      <button @click="removeFromCart(classList)">Remove</button>
+                    <div class="cartImg"><img :src="`${appURL}/` + list.image" alt="Lesson Image"></div>
+                    <p>Subject ID: {{ list.id }} </p>
+                    <p><strong>{{ list.title }}</strong></p>
+                    <p>Price: £{{ list.price }}</p>
+                    <button @click="removeFromCart(list)">Remove</button>
                   </li>
               </ul>
               <p v-if="cartDetails.length === 0">Your cart is empty!</p>

@@ -2,9 +2,10 @@
 let app = new Vue({
   el: '#app',
   data: {
-    appURL: 'https://mathisihub.onrender.com',
+    appURL: 'http://localhost:3000',
+    //  'https://mathisihub.onrender.com',
     cart: [], 
-    classList: list = [],
+    classList: [],
     showPage: true,
     selectedSubject: '',
     sortOption: 'asc',
@@ -82,11 +83,11 @@ let app = new Vue({
               return res.json();
           })
           .then(data => {
-              this.programs = data;
+              this.classList = Array.isArray(data) ? data : [];
               })
           .catch(err => {
               console.error('Error Fetching Programs', err);
+              alert('Could not fetch class data. Please try again later.');
           });
-  }
-    
+      }
 });
