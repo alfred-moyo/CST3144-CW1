@@ -46,6 +46,13 @@
       <!--Display of Available Classes-->
       <div class="content">
         <h2 class="text-center mb-4">Available Classes</h2>
+        
+        <!-- Search Bar -->
+        <div class="search-bar mb-4">
+          <input
+            type="text" class="form-control" v-model="searchQuery" @input="searchLessons" placeholder="Search for lessons..."
+          />
+        </div>
         <div class="row mb-3">
           <div class="col-md-4">
             <label for="filter" class="form-label">Filter by Subject:</label>
