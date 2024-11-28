@@ -46,7 +46,7 @@ let app = new Vue({
         alert("Order placed successfully!")
       },
       refreshLessons() {
-        fetch(`${this.appUrl}/lessons`)
+        fetch(`${this.appURL}/lessons`)
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`Failed to fetch programs. Status: ${res.status}`);
@@ -67,7 +67,7 @@ let app = new Vue({
             return;
         }
 
-        fetch(`${this.appUrl}/search?term=${encodeURIComponent(this.searchQuery)}`)
+        fetch(`${this.appURL}/search?word=${(this.searchQuery)}`)
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`Failed to fetch search results. Status: ${res.status}`);
@@ -81,7 +81,7 @@ let app = new Vue({
             .catch(err => {
                 console.error('Error searching programs:', err);
             });
-    },
+        },
   },
     computed: {
       
