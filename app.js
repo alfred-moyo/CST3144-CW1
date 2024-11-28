@@ -2,8 +2,8 @@
 let app = new Vue({
   el: '#app',
   data: {
-    // appURL: 'http://localhost:3000',
-    appURL: 'https://mathisihub.onrender.com',
+    appURL: 'http://localhost:3000',
+    // appURL: 'https://mathisihub.onrender.com',
     cart: [], 
     classList: [],
     showPage: true,
