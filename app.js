@@ -2,8 +2,8 @@
 let app = new Vue({
   el: '#app',
   data: {
-    appURL: 'http://localhost:3000',
-    // appURL: 'https://mathisihub.onrender.com',
+    // appURL: 'http://localhost:3000',
+    appURL: 'https://mathisihub.onrender.com',
     cart: [], 
     classList: [],
     showPage: true,
@@ -25,16 +25,31 @@ let app = new Vue({
       },
       
       addToCart(classList) {
-        if (this.canAddtoCart(classList)) {
-          this.cart.push(classList);
+        // Check if the item is already in the cart
+        const existingItem = this.cart.find(item => item.id === classList.id);
+      
+        if (existingItem) {
+          // If the item exists, increment its quantity
+          existingItem.quantity += 1;
+        } else {
+          // If the item doesn't exist, add it to the cart with an initial quantity of 1
+          this.cart.push({ ...classList, quantity: 1 });
         }
       },
       removeFromCart(classList) {
         const index = this.cart.findIndex(item => item.id === classList.id);
-        if (index > -1) this.cart.splice(index, 1);
+        if (index > -1) {
+          if (this.cart[index].quantity > 1) {
+            this.cart[index].quantity -= 1; // Decrement quantity if more than 1
+          } else {
+            this.cart.splice(index, 1); // Remove item if quantity is 1
+          }
+        }
       },
       cartCount(id) {
-        return this.cart.filter(item => item.id === id).length;
+        // return this.cart.filter(item => item.id === id).length;
+        const existingItem = this.cart.find(item => item.id === id);
+        return existingItem ? existingItem.quantity : 0;
       },
       itemsLeft(classList) {
           return classList.spaces - this.cartCount(classList.id);
@@ -84,7 +99,10 @@ let app = new Vue({
         },
   },
     computed: {
-      
+
+      totalInCart(){
+        return this.cart.reduce((total, item) => total + item.quantity, 0);
+      },      
       filteredAndSortedClasses() {
         let filtered = this.classList;
         if (this.selectedSubject) {
@@ -108,8 +126,9 @@ let app = new Vue({
       },
 
       totalPrice() {
-        return this.cartDetails.reduce((total, list) => total + list.price, 0);
+        return this.cartDetails.reduce((total, list) => total + list.price * list.quantity, 0);
       }
+      
     },
     created() {
       fetch(`${this.appURL}/lessons`)

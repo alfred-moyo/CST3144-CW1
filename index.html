@@ -31,7 +31,7 @@
                 </li>
                 <button @click="displayCheckout" v-if="cart.length > 0">
                   Cart
-                  <span class="fa solid fa-cart-plus"></span><span class="badge bg-danger">{{ cart.length }}</span>
+                  <span class="fa solid fa-cart-plus"></span><span class="badge bg-danger">{{ totalInCart }}</span>
                 </button>
                 <button v-else>
                   Cart <span class="fa solid fa-cart-plus"> <span class="badge bg-danger">{{ cart.length }}</span></span>
@@ -111,11 +111,13 @@
                   <!-- Loop through cart items and display details -->
                   <li v-for="list in cartDetails" :key="list.id">
                     <div class="cartImg"><img :src="`${appURL}/` + list.image" alt="Lesson Image"></div>
-                    <p>Subject ID: {{ list.id }} </p>
                     <p><strong>{{ list.title }}</strong></p>
                     <p>Price: £{{ list.price }}</p>
+                    <p>Quantity: {{ list.quantity }}</p>
+                    <p>Subtotal: £{{ list.price * list.quantity }}</p>
                     <button @click="removeFromCart(list)">Remove</button>
                   </li>
+                  
               </ul>
               <p v-if="cartDetails.length === 0">Your cart is empty!</p>
               <hr>
