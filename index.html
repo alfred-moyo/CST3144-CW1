@@ -126,10 +126,34 @@
           </div>
           <form>
               <h1>Checkout</h1>
-              <p><strong>Name</strong> <input v-model.trim="order.name"></p>
-              <p><strong>Phone</strong> <input v-model.trim="order.phone" type="tel"></p>
-              <p><strong>City</strong> <input v-model="order.city"></p>
-              <p><strong>Address</strong> <input v-model="order.address" type="address"></p>
+              <p>
+                <strong>Name</strong> 
+                <input v-model.trim="order.name">
+                <span class="error" v-if="formSubmitted && validationErrors.city">
+                  {{ validationErrors.city }}
+                </span>
+              </p>
+              <p>
+                <strong>Phone</strong> 
+                <input v-model.trim="order.phone" type="tel">
+                <span class="error" v-if="formSubmitted && validationErrors.tel">
+                  {{ validationErrors.tel }}
+                </span>
+              </p>
+              <p>
+                <strong>City</strong> 
+                <input v-model="order.city">
+                <span class="error" v-if="formSubmitted && validationErrors.city">
+                  {{ validationErrors.city }}
+                </span>
+              </p>
+              <p>
+                <strong>Address</strong> 
+                <input v-model="order.address" type="address">
+                <span class="error" v-if="formSubmitted && validationErrors.address">
+                  {{ validationErrors.address }}
+                </span>
+              </p>
           </form>
           <div class="detail">
               <div class="details">

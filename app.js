@@ -57,8 +57,126 @@ let app = new Vue({
       displayCheckout() {
         this.showPage = !this.showPage;
       },
+      validateForm() {
+        // Reset previous errors
+        this.validationErrors = {
+          name: "",
+          address: "",
+          city: "",
+          tel: ""
+        };
+      
+        let isValid = true;
+      
+        // Name validation: Only letters and spaces are allowed
+        const nameRegex = /^[a-zA-Z\s]+$/;
+        if (!this.order.name.trim()) {
+          this.validationErrors.name = "Name is required";
+          isValid = false;
+        } else if (this.order.name.trim().length < 2) {
+          this.validationErrors.name = "Name must be at least 2 characters long";
+          isValid = false;
+        } else if (!nameRegex.test(this.order.name.trim())) {
+          this.validationErrors.name = "Name must contain only letters and spaces";
+          isValid = false;
+        }
+      
+        // Phone number validation: Must be 10-11 digits
+        const phoneRegex = /^[0-9]{10,11}$/;
+        if (!this.order.tel.trim()) {
+          this.validationErrors.tel = "Phone number is required";
+          isValid = false;
+        } else if (!phoneRegex.test(this.order.tel.replace(/\s+/g, ''))) {
+          this.validationErrors.tel = "Please enter a valid 10-11 digit phone number";
+          isValid = false;
+        }
+      
+        // City validation
+        if (!this.order.city.trim()) {
+          this.validationErrors.city = "City is required";
+          isValid = false;
+        } else if (this.order.city.trim().length < 2) {
+          this.validationErrors.city = "City must be at least 2 characters long";
+          isValid = false;
+        }
+      
+        // Address validation
+        if (!this.order.address.trim()) {
+          this.validationErrors.address = "Address is required";
+          isValid = false;
+        } else if (this.order.address.trim().length < 5) {
+          this.validationErrors.address = "Address must be at least 5 characters long";
+          isValid = false;
+        }
+      
+        return isValid;
+      },
       submitCheckOut() {
-        alert("Order placed successfully!")
+        // First, check if cart is empty
+        if (this.cart.length === 0) {
+          alert("Your cart is empty!");
+          return;
+        }
+    
+        // Mark form as submitted to show validation errors
+        this.formSubmitted = true;
+    
+        // Validate the form
+        if (!this.validateForm()) {
+          return;
+        }
+        
+        const orderData = {
+          items: this.cart.map(item => ({
+            id: item.id,
+            title: item.title,
+            price: item.price,
+          })),
+          customerDetails: this.order
+        };
+        
+        fetch(`${this.appURL}/order`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(orderData)
+        })
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => Promise.reject(err));
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Use the updatedLessons from the server response
+          if (data.updatedLessons) {
+            this.classList = data.updatedLessons;
+          }
+          
+          // Reset form state
+          this.cart = [];
+          this.order = {
+            name: "",
+            address: "",
+            city: "",
+            tel: ""
+          };
+          this.validationErrors = {
+            name: "",
+            address: "",
+            city: "",
+            tel: ""
+          };
+          this.formSubmitted = false;
+          
+          alert("Order placed successfully!");
+          this.showPage = true;
+        })
+        .catch(error => {
+          console.error('Order error:', error);
+          alert(error.error || "There was an error placing your order. Please try again.");
+        });
       },
       refreshLessons() {
         fetch(`${this.appURL}/lessons`)
