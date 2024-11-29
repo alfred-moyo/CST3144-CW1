@@ -68,7 +68,6 @@
               <option value="desc">Highest to Lowest</option>
               <option value="price-asc">Price Ascending</option>
               <option value="price-desc">Price Descending</option>
-              <option value="rating">Rating</option>
             </select>
           </div>
         </div>
@@ -129,8 +128,8 @@
               <p>
                 <strong>Name</strong> 
                 <input v-model.trim="order.name">
-                <span class="error" v-if="formSubmitted && validationErrors.city">
-                  {{ validationErrors.city }}
+                <span class="error" v-if="formSubmitted && validationErrors.name">
+                  {{ validationErrors.name }}
                 </span>
               </p>
               <p>

@@ -16,7 +16,15 @@ let app = new Vue({
       address: "",
       city: "",
       tel: ""
-    }
+    },
+    validationErrors: {
+      name: "",
+      address: "",
+      city: "",
+      tel: ""
+    },
+    formSubmitted: false,
+    searchError: '' // Added missing searchError property
   },
   methods: {
       canAddtoCart(classList) {
